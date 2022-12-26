@@ -49,6 +49,7 @@ impl Png {
     }
 
     pub fn as_bytes(&self) -> Vec<u8> {
+        // FIXME: this is ugly, but I had type issues
         let mut result = Self::STANDARD_HEADER.to_vec();
         let mut chunks: Vec<u8> = self.chunks.iter().flat_map(|c| c.as_bytes()).collect();
 
