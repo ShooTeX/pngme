@@ -1,22 +1,27 @@
+use std::{
+    fmt::Display,
+    io::{BufRead, BufReader, Read},
+};
+
 use crate::chunk::Chunk;
 use anyhow::{bail, Error, Result};
 
-struct Png {
+pub struct Png {
     chunks: Vec<Chunk>,
 }
 
 impl Png {
     const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 
-    fn from_chunks(chunks: Vec<Chunk>) -> Self {
+    pub fn from_chunks(chunks: Vec<Chunk>) -> Self {
         Self { chunks }
     }
 
-    fn append_chunk(&mut self, chunk: Chunk) {
+    pub fn append_chunk(&mut self, chunk: Chunk) {
         self.chunks.push(chunk);
     }
 
-    fn remove_chunk(&mut self, chunk_type: &str) -> Result<Chunk, Error> {
+    pub fn remove_chunk(&mut self, chunk_type: &str) -> Result<Chunk, Error> {
         let index = match self
             .chunks
             .iter()
@@ -29,22 +34,27 @@ impl Png {
         Ok(self.chunks.remove(index))
     }
 
-    fn header(&self) -> &[u8; 8] {
+    pub fn header(&self) -> &[u8; 8] {
         &Self::STANDARD_HEADER
     }
 
-    fn chunks(&self) -> &[Chunk] {
+    pub fn chunks(&self) -> &[Chunk] {
         &self.chunks
     }
 
-    fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
+    pub fn chunk_by_type(&self, chunk_type: &str) -> Option<&Chunk> {
         self.chunks
             .iter()
             .find(|c| c.chunk_type().to_string() == chunk_type)
     }
 
-    fn as_bytes(&self) -> Vec<u8> {
-        self.chunks.iter().flat_map(|c| c.as_bytes()).collect()
+    pub fn as_bytes(&self) -> Vec<u8> {
+        let mut result = Self::STANDARD_HEADER.to_vec();
+        let mut chunks: Vec<u8> = self.chunks.iter().flat_map(|c| c.as_bytes()).collect();
+
+        result.append(&mut chunks);
+
+        result.to_vec()
     }
 }
 
@@ -52,7 +62,44 @@ impl TryFrom<&[u8]> for Png {
     type Error = Error;
 
     fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        todo!()
+        let mut reader = BufReader::new(value);
+        let mut header: [u8; 8] = [0, 0, 0, 0, 0, 0, 0, 0];
+
+        if reader.read_exact(&mut header).is_err() {
+            bail!("Failed reading header bytes")
+        };
+
+        if header != Self::STANDARD_HEADER {
+            bail!("invalid header")
+        }
+
+        let mut chunks: Vec<Chunk> = vec![];
+        loop {
+            let mut data_length: [u8; 4] = [0, 0, 0, 0];
+            if reader.read_exact(&mut data_length).is_err() {
+                // if !reader.fill_buf()?.is_empty() {
+                //     bail!("invalid bytes");
+                // }
+                break Ok(Self::from_chunks(chunks));
+            };
+
+            let data_length_u32 = u32::from_be_bytes(data_length);
+
+            let mut buffer = vec![0u8; (data_length_u32 + 8).try_into()?];
+            if let Err(e) = reader.read_exact(&mut buffer) {
+                bail!("Failed reading chunk bytes: {e}, data_length: {:#?}, value: {:#?}", data_length, value)
+            };
+
+            let buffer: Vec<u8> = data_length.iter().chain(buffer.iter()).cloned().collect();
+
+            chunks.push(Chunk::try_from(&buffer[..])?);
+        }
+    }
+}
+
+impl Display for Png {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "what? PNG")
     }
 }
 
@@ -109,6 +156,11 @@ mod tests {
             .collect();
 
         let png = Png::try_from(bytes.as_ref());
+
+        if let Err(e) = &png {
+            println!("{:#?}", e)
+        }
+        
 
         assert!(png.is_ok());
     }
