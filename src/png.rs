@@ -99,6 +99,7 @@ impl TryFrom<&[u8]> for Png {
 }
 
 impl Display for Png {
+    // FIXME:: don't know what to display atm
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "what? PNG")
     }
