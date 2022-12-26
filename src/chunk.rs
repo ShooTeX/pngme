@@ -8,29 +8,29 @@ use crc::{Crc, CRC_32_ISO_HDLC};
 
 use crate::chunk_type::ChunkType;
 
-struct Chunk {
+pub struct Chunk {
     chunk_type: ChunkType,
     data: Vec<u8>,
 }
 
 impl Chunk {
-    fn new(chunk_type: ChunkType, data: Vec<u8>) -> Self {
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Self {
         Self { chunk_type, data }
     }
 
-    fn length(&self) -> u32 {
+    pub fn length(&self) -> u32 {
         self.data.len().try_into().unwrap()
     }
 
-    fn chunk_type(&self) -> &ChunkType {
+    pub fn chunk_type(&self) -> &ChunkType {
         &self.chunk_type
     }
 
-    fn data(&self) -> &[u8] {
+    pub fn data(&self) -> &[u8] {
         &self.data
     }
 
-    fn crc(&self) -> u32 {
+    pub fn crc(&self) -> u32 {
         let crc: Crc<u32> = Crc::<u32>::new(&CRC_32_ISO_HDLC);
 
         let bytes: Vec<u8> = self
@@ -44,14 +44,14 @@ impl Chunk {
         crc.checksum(&bytes)
     }
 
-    fn data_as_string(&self) -> Result<String> {
+    pub fn data_as_string(&self) -> Result<String> {
         match String::from_utf8(self.data.clone()) {
             Ok(s) => Ok(s),
             Err(_) => bail!("Failed to format string"),
         }
     }
 
-    fn as_bytes(&self) -> Vec<u8> {
+    pub fn as_bytes(&self) -> Vec<u8> {
         self.data.clone()
     }
 }
