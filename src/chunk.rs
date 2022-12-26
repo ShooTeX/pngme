@@ -52,7 +52,12 @@ impl Chunk {
     }
 
     pub fn as_bytes(&self) -> Vec<u8> {
-        self.data.clone()
+        self.length()
+            .to_be_bytes()
+            .iter()
+            .chain(self.chunk_type().bytes().iter())
+            .chain(self.data().iter())
+            .chain(self.crc().to_be_bytes().iter()).cloned().collect()
     }
 }
 
@@ -63,12 +68,17 @@ impl TryFrom<&[u8]> for Chunk {
         let mut reader = BufReader::new(value);
         let mut length: [u8; 4] = [0, 0, 0, 0];
 
-        reader.read_exact(&mut length)?;
+        if reader.read_exact(&mut length).is_err() {
+            bail!("Failed reading data_length bytes")
+        };
 
         let length = u32::from_be_bytes(length);
 
         let mut chunk_type: [u8; 4] = [0, 0, 0, 0];
-        reader.read_exact(&mut chunk_type)?;
+        if reader.read_exact(&mut chunk_type).is_err() {
+            bail!("Failed reading chunk_type bytes")
+        };
+
         let chunk_type = ChunkType::try_from(chunk_type)?;
 
         if !chunk_type.is_valid() {
@@ -77,18 +87,19 @@ impl TryFrom<&[u8]> for Chunk {
 
         let mut data = vec![0u8; length.try_into()?];
 
-        reader.read_exact(&mut data)?;
+        if reader.read_exact(&mut data).is_err() {
+            bail!("Failed reading data bytes")
+        };
 
         let mut crc: [u8; 4] = [0, 0, 0, 0];
 
-        reader.read_exact(&mut crc)?;
+        if reader.read_exact(&mut crc).is_err() {
+            bail!("Failed reading crc bytes")
+        };
 
         let crc = u32::from_be_bytes(crc);
 
-        let chunk = Self {
-            chunk_type,
-            data,
-        };
+        let chunk = Self { chunk_type, data };
 
         if chunk.crc() != crc {
             bail!("invalid crc")
