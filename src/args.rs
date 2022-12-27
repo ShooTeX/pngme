@@ -34,6 +34,7 @@ pub enum Commands {
         output_path: Option<PathBuf>,
     },
 
+    /// Decode a secret message from a PNG file
     Decode {
         /// A Valid PNG file
         #[arg(value_parser = png_parser, name = "FILE_PATH")]
