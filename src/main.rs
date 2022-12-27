@@ -34,6 +34,9 @@ fn main() -> Result<()> {
         }
         args::Commands::Decode { file, chunk_type } => todo!(),
         args::Commands::Remove { file, chunk_type } => todo!(),
-        args::Commands::Print { file } => todo!(),
+        args::Commands::Print { file } => {
+            print!("{file}");
+            Ok(())
+        },
     }
 }
