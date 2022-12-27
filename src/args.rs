@@ -8,45 +8,58 @@ use crate::{chunk_type::ChunkType, png::Png};
 /// Simple CLI tool to hide messages inside a PNG
 #[derive(Debug, Parser)]
 #[command(name = "pngme")]
-#[command(author = "Erik Simon", version)]
+#[command(author, version)]
 #[command(about = "Simple CLI tool to hide messages inside a PNG", long_about = None)]
 pub struct PngArgs {
     #[command(subcommand)]
-    command: Commands,
+    pub command: Commands,
 }
 
 #[derive(Debug, Subcommand)]
-enum Commands {
+pub enum Commands {
     /// Encode a secret message into a PNG file
     Encode {
-        #[arg(value_parser = png_parser)]
-        file_path: Png,
+        /// A Valid PNG file
+        #[arg(value_parser = png_parser, name = "FILE_PATH")]
+        file: Png,
 
+        /// A chunk type, i.e. `ruSt`
         #[arg(value_parser = chunk_type_parser)]
         chunk_type: ChunkType,
+
+        /// Your secret message
         message: String,
 
+        /// The output for the PNG with the secret message
         output_path: Option<PathBuf>,
     },
-    Decode {
-        #[arg(value_parser = png_parser)]
-        file_path: PathBuf,
 
+    Decode {
+        /// A Valid PNG file
+        #[arg(value_parser = png_parser, name = "FILE_PATH")]
+        file: Png,
+
+        /// A chunk type, i.e. `ruSt`
         #[arg(value_parser = chunk_type_parser)]
-        chunk_type: String,
+        chunk_type: ChunkType,
     },
+
     /// Remove chunk from PNG
     Remove {
-        #[arg(value_parser = png_parser)]
-        file_path: PathBuf,
+        /// A Valid PNG file
+        #[arg(value_parser = png_parser, name = "FILE_PATH")]
+        file: Png,
 
+        /// A chunk type, i.e. `ruSt`
         #[arg(value_parser = chunk_type_parser)]
-        chunk_type: String,
+        chunk_type: ChunkType,
     },
+
     /// Print from PNG
     Print {
-        #[arg(value_parser = png_parser)]
-        file_path: PathBuf,
+        /// A Valid PNG file
+        #[arg(value_parser = png_parser, name = "FILE_PATH")]
+        file: Png,
     },
 }
 
