@@ -1,6 +1,6 @@
-use std::{fs::File, os::unix::prelude::FileExt};
+use std::{fs::{File, self}, os::unix::prelude::FileExt};
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use args::PngArgs;
 use chunk::Chunk;
 use clap::Parser;
@@ -32,11 +32,24 @@ fn main() -> Result<()> {
             };
             Ok(())
         }
-        args::Commands::Decode { file, chunk_type } => todo!(),
-        args::Commands::Remove { file, chunk_type } => todo!(),
+        args::Commands::Decode { file, chunk_type } => {
+            let chunk = match file.chunk_by_type(&chunk_type.to_string()) {
+                Some(c) => c,
+                None => bail!("Chunk not found"),
+            };
+
+            println!("{chunk}");
+
+            Ok(())
+        }
+        args::Commands::Remove { file, chunk_type } => {
+            let _new_png = file.clone().remove_chunk(&chunk_type.to_string())?;
+
+            Ok(())
+        },
         args::Commands::Print { file } => {
             print!("{file}");
             Ok(())
-        },
+        }
     }
 }
