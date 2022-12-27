@@ -8,6 +8,7 @@ use crc::{Crc, CRC_32_ISO_HDLC};
 
 use crate::chunk_type::ChunkType;
 
+#[derive(Clone, Debug)]
 pub struct Chunk {
     chunk_type: ChunkType,
     data: Vec<u8>,

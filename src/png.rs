@@ -1,11 +1,12 @@
 use std::{
     fmt::Display,
-    io::{BufRead, BufReader, Read},
+    io::{BufReader, Read},
 };
 
 use crate::chunk::Chunk;
 use anyhow::{bail, Error, Result};
 
+#[derive(Clone, Debug)]
 pub struct Png {
     chunks: Vec<Chunk>,
 }
@@ -87,8 +88,8 @@ impl TryFrom<&[u8]> for Png {
             let data_length_u32 = u32::from_be_bytes(data_length);
 
             let mut buffer = vec![0u8; (data_length_u32 + 8).try_into()?];
-            if let Err(e) = reader.read_exact(&mut buffer) {
-                bail!("Failed reading chunk bytes: {e}, data_length: {:#?}, value: {:#?}", data_length, value)
+            if reader.read_exact(&mut buffer).is_err() {
+                bail!("Failed reading chunk bytes",)
             };
 
             let buffer: Vec<u8> = data_length.iter().chain(buffer.iter()).cloned().collect();
@@ -162,7 +163,6 @@ mod tests {
         if let Err(e) = &png {
             println!("{:#?}", e)
         }
-        
 
         assert!(png.is_ok());
     }
