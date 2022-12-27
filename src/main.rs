@@ -1,4 +1,4 @@
-use std::{fs::{File, self}, os::unix::prelude::FileExt};
+use std::fs;
 
 use anyhow::{bail, Result};
 use args::PngArgs;
@@ -26,9 +26,7 @@ fn main() -> Result<()> {
             new_png.append_chunk(chunk);
 
             if let Some(output) = output_path {
-                let file = File::create(output)?;
-
-                file.write_all_at(&new_png.as_bytes(), 0)?;
+                fs::write(output, new_png.as_bytes())?;
             };
             Ok(())
         }
@@ -46,7 +44,7 @@ fn main() -> Result<()> {
             let _new_png = file.clone().remove_chunk(&chunk_type.to_string())?;
 
             Ok(())
-        },
+        }
         args::Commands::Print { file } => {
             print!("{file}");
             Ok(())
