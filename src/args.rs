@@ -3,7 +3,7 @@ use std::{fs, path::PathBuf, str::FromStr};
 use anyhow::{anyhow, bail, Result};
 use clap::{Parser, Subcommand};
 
-use crate::{chunk_type::ChunkType, png::Png};
+use crate::{chunk_type::ChunkType, file::File, png::Png};
 
 /// Simple CLI tool to hide messages inside a PNG
 #[derive(Debug, Parser)]
@@ -21,7 +21,7 @@ pub enum Commands {
     Encode {
         /// A Valid PNG file
         #[arg(value_parser = png_parser, name = "FILE_PATH")]
-        file: Png,
+        file: File,
 
         /// A chunk type, i.e. `ruSt`
         #[arg(value_parser = chunk_type_parser)]
@@ -38,7 +38,7 @@ pub enum Commands {
     Decode {
         /// A Valid PNG file
         #[arg(value_parser = png_parser, name = "FILE_PATH")]
-        file: Png,
+        file: File,
 
         /// A chunk type, i.e. `ruSt`
         #[arg(value_parser = chunk_type_parser)]
@@ -49,7 +49,7 @@ pub enum Commands {
     Remove {
         /// A Valid PNG file
         #[arg(value_parser = png_parser, name = "FILE_PATH")]
-        file: Png,
+        file: File,
 
         /// A chunk type, i.e. `ruSt`
         #[arg(value_parser = chunk_type_parser)]
@@ -60,14 +60,19 @@ pub enum Commands {
     Print {
         /// A Valid PNG file
         #[arg(value_parser = png_parser, name = "FILE_PATH")]
-        file: Png,
+        file: File,
     },
 }
 
-fn png_parser(p: &str) -> Result<Png> {
-    let file = fs::read(p)?;
+fn png_parser(p: &str) -> Result<File> {
+    let file_bytes = fs::read(p)?;
 
-    Png::try_from(&file[..]).map_err(|e| anyhow!("Invalid file: {e}"))
+    let file = Png::try_from(&file_bytes[..]).map_err(|e| anyhow!("Invalid file: {e}"))?;
+
+    Ok(File {
+        png: file,
+        path: p.to_string(),
+    })
 }
 
 fn chunk_type_parser(ct: &str) -> Result<ChunkType> {

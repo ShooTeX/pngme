@@ -111,7 +111,6 @@ mod tests {
     use super::*;
     use crate::chunk::Chunk;
     use crate::chunk_type::ChunkType;
-    use crate::Error;
     use std::convert::TryFrom;
     use std::str::FromStr;
 
