@@ -2,7 +2,7 @@
 name = "pngme"
 version = "0.1.0"
 edition = "2021"
-author = "Erik Simon <hey@eriksimon.dev>"
+authors = ["Erik Simon <hey@eriksimon.dev>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

@@ -1,21 +1,17 @@
 use std::fs;
 
 use anyhow::{bail, Result};
-use args::PngArgs;
-use chunk::Chunk;
 use clap::Parser;
-
-mod args;
-mod chunk;
-mod chunk_type;
-// mod commands;
-mod png;
+use pngme::{
+    args::{self, Commands, PngArgs},
+    chunk::Chunk,
+};
 
 fn main() -> Result<()> {
     let args = PngArgs::parse();
 
     match &args.command {
-        args::Commands::Encode {
+        Commands::Encode {
             file,
             chunk_type,
             message,
