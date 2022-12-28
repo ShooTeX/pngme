@@ -3,6 +3,7 @@ name = "pngme"
 version = "0.1.0"
 edition = "2021"
 authors = ["Erik Simon <hey@eriksimon.dev>"]
+publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -10,6 +11,3 @@ authors = ["Erik Simon <hey@eriksimon.dev>"]
 anyhow = "1.0"
 clap = { version = "4.0.32", features = ["derive"] }
 crc = "3.0"
-
-[package]
-publish = false

@@ -23,7 +23,7 @@ fn main() -> Result<()> {
 
             if let Some(output) = output_path {
                 fs::write(output, new_png.as_bytes())?;
-                return Ok(())
+                return Ok(());
             };
 
             fs::write(file.path(), new_png.as_bytes())?;
@@ -42,7 +42,7 @@ fn main() -> Result<()> {
         }
         args::Commands::Remove { file, chunk_type } => {
             let new_png = file.png().clone().remove_chunk(&chunk_type.to_string())?;
-            
+
             fs::write(file.path(), new_png.as_bytes())?;
 
             Ok(())
