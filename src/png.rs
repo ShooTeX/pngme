@@ -102,7 +102,7 @@ impl TryFrom<&[u8]> for Png {
 impl Display for Png {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let output = self.chunks();
-        write!(f, "{:#?}", output)
+        write!(f, "{output:#?}")
     }
 }
 

@@ -58,7 +58,9 @@ impl Chunk {
             .iter()
             .chain(self.chunk_type().bytes().iter())
             .chain(self.data().iter())
-            .chain(self.crc().to_be_bytes().iter()).cloned().collect()
+            .chain(self.crc().to_be_bytes().iter())
+            .cloned()
+            .collect()
     }
 }
 
@@ -244,6 +246,6 @@ mod tests {
 
         let chunk: Chunk = TryFrom::try_from(chunk_data.as_ref()).unwrap();
 
-        let _chunk_string = format!("{}", chunk);
+        let _chunk_string = format!("{chunk}");
     }
 }
