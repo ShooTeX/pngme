@@ -69,10 +69,7 @@ fn png_parser(p: &str) -> Result<File> {
 
     let file = Png::try_from(&file_bytes[..]).map_err(|e| anyhow!("Invalid file: {e}"))?;
 
-    Ok(File {
-        png: file,
-        path: p.to_string(),
-    })
+    Ok(File::new(file, p.to_string()))
 }
 
 fn chunk_type_parser(ct: &str) -> Result<ChunkType> {

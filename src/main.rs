@@ -18,16 +18,20 @@ fn main() -> Result<()> {
             output_path,
         } => {
             let chunk = Chunk::new(chunk_type.clone(), message.as_bytes().to_vec());
-            let mut new_png = file.clone();
+            let mut new_png = file.png().clone();
             new_png.append_chunk(chunk);
 
             if let Some(output) = output_path {
                 fs::write(output, new_png.as_bytes())?;
+                return Ok(())
             };
+
+            fs::write(file.path(), new_png.as_bytes())?;
+
             Ok(())
         }
         args::Commands::Decode { file, chunk_type } => {
-            let chunk = match file.chunk_by_type(&chunk_type.to_string()) {
+            let chunk = match file.png().chunk_by_type(&chunk_type.to_string()) {
                 Some(c) => c,
                 None => bail!("Chunk not found"),
             };
@@ -37,11 +41,14 @@ fn main() -> Result<()> {
             Ok(())
         }
         args::Commands::Remove { file, chunk_type } => {
-            let _new_png = file.clone().remove_chunk(&chunk_type.to_string())?;
+            let new_png = file.png().clone().remove_chunk(&chunk_type.to_string())?;
+            
+            fs::write(file.path(), new_png.as_bytes())?;
 
             Ok(())
         }
         args::Commands::Print { file } => {
+            let file = file.png();
             print!("{file}");
             Ok(())
         }

@@ -7,6 +7,8 @@ pub struct File {
 }
 
 impl File {
+    pub fn new(png: Png, path: String) -> Self { Self { png, path } }
+
     pub fn png(&self) -> &Png {
         &self.png
     }
