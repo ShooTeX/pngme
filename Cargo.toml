@@ -10,3 +10,6 @@ authors = ["Erik Simon <hey@eriksimon.dev>"]
 anyhow = "1.0"
 clap = { version = "4.0.32", features = ["derive"] }
 crc = "3.0"
+
+[package]
+publish = false
