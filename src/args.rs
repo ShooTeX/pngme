@@ -40,9 +40,10 @@ pub enum Commands {
         #[arg(value_parser = png_parser, name = "FILE_PATH")]
         file: File,
 
-        /// A chunk type, i.e. `ruSt`
+        /// A chunk type, i.e. `ruSt`.
+        /// Leave empty to search for potential secret messages.
         #[arg(value_parser = chunk_type_parser)]
-        chunk_type: ChunkType,
+        chunk_type: Option<ChunkType>,
     },
 
     /// Remove chunk from PNG
