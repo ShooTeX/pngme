@@ -101,7 +101,11 @@ impl TryFrom<&[u8]> for Png {
 
 impl Display for Png {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let output = self.chunks();
+        let output: Vec<String> = self
+            .chunks()
+            .iter()
+            .map(|c| c.chunk_type().to_string())
+            .collect();
         write!(f, "{output:#?}")
     }
 }
