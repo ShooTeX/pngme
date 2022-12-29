@@ -31,12 +31,29 @@ fn main() -> Result<()> {
             Ok(())
         }
         args::Commands::Decode { file, chunk_type } => {
-            let chunk = match file.png().chunk_by_type(&chunk_type.to_string()) {
-                Some(c) => c,
-                None => bail!("Chunk not found"),
+            if let Some(chunk_type) = chunk_type {
+                let chunk = match file.png().chunk_by_type(&chunk_type.to_string()) {
+                    Some(c) => c,
+                    None => bail!("Chunk not found"),
+                };
+
+                println!("{chunk}");
+
+                return Ok(());
             };
 
-            println!("{chunk}");
+            let messages: Vec<_> = file
+                .png()
+                .chunks()
+                .iter()
+                .filter_map(|c| c.data_as_string().ok())
+                .filter(|s| !s.is_empty())
+                .collect();
+
+            match messages[..] {
+                [] => bail!("No potential secret messages found."),
+                _ => println!("{messages:?}"),
+            }
 
             Ok(())
         }
