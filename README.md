@@ -21,3 +21,18 @@ Options:
   -h, --help     Print help information
   -V, --version  Print version information
 ```
+
+```stdout
+Encode a secret message into a PNG file
+
+Usage: pngme encode <INPUT> <CHUNK_TYPE> <MESSAGE> [OUTPUT_PATH]
+
+Arguments:
+  <INPUT>        File path or url to a png file
+  <CHUNK_TYPE>   A chunk type, i.e. `ruSt`
+  <MESSAGE>      Your secret message
+  [OUTPUT_PATH]  The output for the PNG with the secret message
+
+Options:
+  -h, --help  Print help information
+```
