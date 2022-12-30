@@ -22,7 +22,7 @@ pub enum Commands {
     /// Encode a secret message into a PNG file
     #[command(arg_required_else_help = true)]
     Encode {
-        /// A Valid PNG file
+        /// File path or url to a png file
         #[arg(value_parser = Input::from_str)]
         input: Input,
 
@@ -40,7 +40,7 @@ pub enum Commands {
     /// Decode a secret message from a PNG file
     #[command(arg_required_else_help = true)]
     Decode {
-        /// A Valid PNG file
+        /// File path or url to a png file
         #[arg(value_parser = Input::from_str)]
         input: Input,
 
@@ -53,7 +53,7 @@ pub enum Commands {
     /// Remove chunk from PNG
     #[command(arg_required_else_help = true)]
     Remove {
-        /// A Valid PNG file
+        /// File path or url to a png file
         #[arg(value_parser = Input::from_str)]
         input: Input,
 
@@ -65,7 +65,7 @@ pub enum Commands {
     /// Print from PNG
     #[command(arg_required_else_help = true)]
     Print {
-        /// A Valid PNG file
+        /// File path or url to a png file
         #[arg(value_parser = Input::from_str)]
         input: Input,
     },
