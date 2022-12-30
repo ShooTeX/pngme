@@ -1,6 +1,6 @@
 use std::{fs, path::PathBuf, str::FromStr};
 
-use anyhow::{anyhow, bail, Result, Error};
+use anyhow::{anyhow, bail, Error, Result};
 use clap::{Parser, Subcommand};
 
 use crate::{chunk_type::ChunkType, png::Png};
@@ -10,6 +10,7 @@ use crate::{chunk_type::ChunkType, png::Png};
 #[command(name = "pngme")]
 #[command(author, version)]
 #[command(about = "Simple CLI tool to hide messages inside a PNG", long_about = None)]
+#[command(arg_required_else_help = true)]
 pub struct PngArgs {
     #[command(subcommand)]
     pub command: Commands,
@@ -18,6 +19,7 @@ pub struct PngArgs {
 #[derive(Debug, Subcommand)]
 pub enum Commands {
     /// Encode a secret message into a PNG file
+    #[command(arg_required_else_help = true)]
     Encode {
         /// A Valid PNG file
         #[arg(value_parser = Input::from_str)]
@@ -35,6 +37,7 @@ pub enum Commands {
     },
 
     /// Decode a secret message from a PNG file
+    #[command(arg_required_else_help = true)]
     Decode {
         /// A Valid PNG file
         #[arg(value_parser = Input::from_str)]
@@ -47,6 +50,7 @@ pub enum Commands {
     },
 
     /// Remove chunk from PNG
+    #[command(arg_required_else_help = true)]
     Remove {
         /// A Valid PNG file
         #[arg(value_parser = Input::from_str)]
@@ -58,6 +62,7 @@ pub enum Commands {
     },
 
     /// Print from PNG
+    #[command(arg_required_else_help = true)]
     Print {
         /// A Valid PNG file
         #[arg(value_parser = Input::from_str)]
