@@ -1,9 +1,9 @@
 use std::{fs, path::PathBuf, str::FromStr};
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{anyhow, bail, Result, Error};
 use clap::{Parser, Subcommand};
 
-use crate::{chunk_type::ChunkType, file::File, png::Png};
+use crate::{chunk_type::ChunkType, png::Png};
 
 /// Simple CLI tool to hide messages inside a PNG
 #[derive(Debug, Parser)]
@@ -20,8 +20,8 @@ pub enum Commands {
     /// Encode a secret message into a PNG file
     Encode {
         /// A Valid PNG file
-        #[arg(value_parser = png_parser, name = "FILE_PATH")]
-        file: File,
+        #[arg(value_parser = Input::from_str)]
+        input: Input,
 
         /// A chunk type, i.e. `ruSt`
         #[arg(value_parser = chunk_type_parser)]
@@ -37,8 +37,8 @@ pub enum Commands {
     /// Decode a secret message from a PNG file
     Decode {
         /// A Valid PNG file
-        #[arg(value_parser = png_parser, name = "FILE_PATH")]
-        file: File,
+        #[arg(value_parser = Input::from_str)]
+        input: Input,
 
         /// A chunk type, i.e. `ruSt`.
         /// Leave empty to search for potential secret messages.
@@ -49,8 +49,8 @@ pub enum Commands {
     /// Remove chunk from PNG
     Remove {
         /// A Valid PNG file
-        #[arg(value_parser = png_parser, name = "FILE_PATH")]
-        file: File,
+        #[arg(value_parser = Input::from_str)]
+        input: Input,
 
         /// A chunk type, i.e. `ruSt`
         #[arg(value_parser = chunk_type_parser)]
@@ -60,17 +60,30 @@ pub enum Commands {
     /// Print from PNG
     Print {
         /// A Valid PNG file
-        #[arg(value_parser = png_parser, name = "FILE_PATH")]
-        file: File,
+        #[arg(value_parser = Input::from_str)]
+        input: Input,
     },
 }
 
-fn png_parser(p: &str) -> Result<File> {
-    let file_bytes = fs::read(p)?;
+#[derive(Clone, Debug)]
+pub struct Input {
+    pub png: Png,
+    pub path: Option<String>,
+}
 
-    let file = Png::try_from(&file_bytes[..]).map_err(|e| anyhow!("Invalid file: {e}"))?;
+impl FromStr for Input {
+    type Err = Error;
 
-    Ok(File::new(file, p.to_string()))
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let file_bytes = fs::read(s)?;
+
+        let png = Png::try_from(&file_bytes[..]).map_err(|e| anyhow!("Invalid file: {e}"))?;
+
+        Ok(Input {
+            png,
+            path: Some(s.to_string()),
+        })
+    }
 }
 
 fn chunk_type_parser(ct: &str) -> Result<ChunkType> {
