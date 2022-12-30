@@ -32,7 +32,7 @@ fn main() -> Result<()> {
 
             Ok(())
         }
-        
+
         args::Commands::Decode { input, chunk_type } => {
             if let Some(chunk_type) = chunk_type {
                 let chunk = match input.png.chunk_by_type(&chunk_type.to_string()) {
@@ -60,7 +60,7 @@ fn main() -> Result<()> {
 
             Ok(())
         }
-        
+
         args::Commands::Remove { input, chunk_type } => {
             let new_png = input.png.clone().remove_chunk(&chunk_type.to_string())?;
 
@@ -70,7 +70,7 @@ fn main() -> Result<()> {
 
             Ok(())
         }
-        
+
         args::Commands::Print { input } => {
             let file = &input.png;
             print!("{file}");
