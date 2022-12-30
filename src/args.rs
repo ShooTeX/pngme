@@ -82,12 +82,12 @@ impl FromStr for Input {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let is_url = s.starts_with("https");
-        
+
         let file_bytes = match is_url {
             true => blocking::get(s)?.bytes()?.into(),
             false => fs::read(s)?,
         };
-        
+
         let png = Png::try_from(&file_bytes[..]).map_err(|e| anyhow!("Invalid file: {e}"))?;
 
         Ok(Input {
