@@ -12,13 +12,13 @@ fn main() -> Result<()> {
 
     match &args.command {
         Commands::Encode {
-            file,
+            input,
             chunk_type,
             message,
             output_path,
         } => {
             let chunk = Chunk::new(chunk_type.clone(), message.as_bytes().to_vec());
-            let mut new_png = file.png().clone();
+            let mut new_png = input.png.clone();
             new_png.append_chunk(chunk);
 
             if let Some(output) = output_path {
@@ -26,13 +26,16 @@ fn main() -> Result<()> {
                 return Ok(());
             };
 
-            fs::write(file.path(), new_png.as_bytes())?;
+            if let Some(path) = &input.path {
+                fs::write(path, new_png.as_bytes())?;
+            }
 
             Ok(())
         }
-        args::Commands::Decode { file, chunk_type } => {
+        
+        args::Commands::Decode { input, chunk_type } => {
             if let Some(chunk_type) = chunk_type {
-                let chunk = match file.png().chunk_by_type(&chunk_type.to_string()) {
+                let chunk = match input.png.chunk_by_type(&chunk_type.to_string()) {
                     Some(c) => c,
                     None => bail!("Chunk not found"),
                 };
@@ -42,8 +45,8 @@ fn main() -> Result<()> {
                 return Ok(());
             };
 
-            let messages: Vec<_> = file
-                .png()
+            let messages: Vec<_> = input
+                .png
                 .chunks()
                 .iter()
                 .filter_map(|c| c.data_as_string().ok())
@@ -57,15 +60,19 @@ fn main() -> Result<()> {
 
             Ok(())
         }
-        args::Commands::Remove { file, chunk_type } => {
-            let new_png = file.png().clone().remove_chunk(&chunk_type.to_string())?;
+        
+        args::Commands::Remove { input, chunk_type } => {
+            let new_png = input.png.clone().remove_chunk(&chunk_type.to_string())?;
 
-            fs::write(file.path(), new_png.as_bytes())?;
+            if let Some(path) = &input.path {
+                fs::write(path, new_png.as_bytes())?;
+            }
 
             Ok(())
         }
-        args::Commands::Print { file } => {
-            let file = file.png();
+        
+        args::Commands::Print { input } => {
+            let file = &input.png;
             print!("{file}");
             Ok(())
         }
